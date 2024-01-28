@@ -28,7 +28,7 @@ public class GameController : MonoBehaviour
 
     void CheckPoints()
     {
-        textoPuntos.text = puntos.ToString();
+        if(life > 0) textoPuntos.text = puntos.ToString();
 
     }
     private void CheckLife()

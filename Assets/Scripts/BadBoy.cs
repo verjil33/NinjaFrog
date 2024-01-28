@@ -4,18 +4,17 @@ using UnityEngine;
 
 public class BadBoy : MonoBehaviour
 {
-    public int speed;
-    [SerializeField] private GameObject leftWall;
-    [SerializeField] private GameObject rightWall;   
+    public int speed;    
     public Animator anim;
-    [SerializeField] private Collider2D collider;
     [SerializeField] private LayerMask ground;
     [SerializeField] private bool facingLeft;
+    [SerializeField] private Collider2D checkNextPos;
+    public int dir = -1;
+
 
 
     private void Start()
     {
-        collider = GetComponent<Collider2D>();
         anim = GetComponent<Animator>();
     }
     // Update is called once per frame
@@ -35,6 +34,7 @@ public class BadBoy : MonoBehaviour
         if (collision.gameObject.tag == "Enemy")
         {
             ChangeDirection();
+            
         }        
     }
 
@@ -48,36 +48,31 @@ public class BadBoy : MonoBehaviour
     }
 
     private void Movement()
-    {        
-        if (facingLeft)
+    {
+        this.transform.position += new Vector3(dir*speed*Time.deltaTime,0,0);
+
+        if (dir == -1)
         {
-            if (this.transform.position.x > leftWall.transform.position.x)
+            if (!checkNextPos.IsTouchingLayers(ground))
             {
-                if (transform.localScale.x != -1)
-                {
-                    transform.localScale = new Vector3(-1, 1, 1);                    
-                }
-                if (collider.IsTouchingLayers(ground))
-                {
-                    this.transform.position += Vector3.left * speed * Time.deltaTime;
-                } 
-            }
-            else facingLeft = false;
-        }
-        else
-        {
-            if (this.transform.position.x < rightWall.transform.position.x)
-            {
+                
                 if (transform.localScale.x != 1)
                 {
                     transform.localScale = new Vector3(1, 1, 1);
                 }
-                if (collider.IsTouchingLayers(ground))
-                {
-                    this.transform.position += Vector3.right * speed * Time.deltaTime;
-                }                               
+                dir = dir * -1;
             }
-            else facingLeft = true;  
+        }
+        else if (dir == 1)
+        {
+            if (!checkNextPos.IsTouchingLayers(ground))
+            {
+                if (transform.localScale.x != -1)
+                {
+                    transform.localScale = new Vector3(-1, 1, 1);
+                }
+                dir = dir * -1;
+            }
         } 
     }
 

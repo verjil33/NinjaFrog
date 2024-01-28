@@ -7,15 +7,17 @@ public class PlayerActor : MonoBehaviour
 {
     [SerializeField] private string anotherTry;
     public Rigidbody2D rb;
-    [SerializeField] private float speed = 5f; 
+    [SerializeField] private float speed = 5f;
+    public int jump = 2;
     [SerializeField] private Pool skillPool;
     private bool facingRight = true;
     private float directionX;
     private float directionY;
     private Collider2D coll;
     [SerializeField] private LayerMask ground;
-    private enum State { idle, run, jump, fall }
-    private State state = State.idle;
+    public enum State { idle, run, jump, fall, dead }
+
+    public State state = State.idle;
     public Animator anim;
     
     
@@ -65,23 +67,27 @@ public class PlayerActor : MonoBehaviour
         else if (directionX == 0 && directionY == 0)
         {
             rb.velocity = new Vector2(0, rb.velocity.y);
-            if (coll.IsTouchingLayers(ground))
+            if (coll.IsTouchingLayers(ground) && state != State.jump && state != State.fall)
             {
                 state = State.idle;
             }
            
         }
+
         if (Input.GetKeyDown(KeyCode.W) && coll.IsTouchingLayers(ground))
         {
             if (coll.IsTouchingLayers(ground))
             {
                 rb.constraints = RigidbodyConstraints2D.FreezeRotation;
             }
-            rb.velocity = new Vector2(rb.velocity.x, speed * 2);
+
             state = State.jump;
-        }        
-        StateChanger();
+            rb.velocity = new Vector2(rb.velocity.x, speed * jump);
+
+        }
+        //Debug.Log(state);
         anim.SetInteger("state", (int)state);
+        StateChanger();
     }
 
     private void Parar()
@@ -100,6 +106,7 @@ public class PlayerActor : MonoBehaviour
         {
             if(rb.velocity.y < 0)
             {
+                //Debug.Log("F");
                 state = State.fall;
             }
         }
