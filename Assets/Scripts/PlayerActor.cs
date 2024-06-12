@@ -16,6 +16,8 @@ public class PlayerActor : MonoBehaviour
     private Collider2D coll;
     [SerializeField] private LayerMask ground;
     public enum State { idle, run, jump, fall, dead }
+    public GameObject shooter;
+    private Vector3 direction;
 
     public State state = State.idle;
     public Animator anim;
@@ -43,25 +45,34 @@ public class PlayerActor : MonoBehaviour
     
 
     private void Movement()
-    {       
+    {
         if (directionX < 0)
         {
-            rb.velocity = new Vector2(-speed, rb.velocity.y);
-            transform.localScale = new Vector2(-1, 1);            
+            Debug.Log("moviendo izquierda");
+            //this.transform.position -= new Vector3(speed * Time.deltaTime, this.transform.position.y);
+            rb.velocity = new Vector2(-speed, transform.position.y);
+            transform.localScale = new Vector2(-1, 1);
+
             if (state !=State.jump && state != State.fall)
             {
                 state = State.run;
+                rb.constraints = RigidbodyConstraints2D.FreezeRotation;
             }
             facingRight = false;
         }
         else if (directionX > 0)
-        {            
-            rb.velocity = new Vector2(speed, rb.velocity.y);
+        {
+            Debug.Log("moviendo derecha");
+
+            rb.velocity = new Vector2(speed, transform.position.y);
             transform.localScale = new Vector2(1, 1);
             facingRight = true;
+
             if (state != State.jump && state != State.fall)
             {
                 state = State.run;
+                rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+
             }
         }
         else if (directionX == 0 && directionY == 0)
@@ -134,12 +145,12 @@ public class PlayerActor : MonoBehaviour
 
             if (facingRight)
             {                
-                skillPool.PoolRequest(this.transform.position, this.transform.rotation);
+                skillPool.PoolRequest(shooter.transform.position, this.transform.rotation);
             }
             else
             {
                 this.transform.rotation = new Quaternion(0, -1, 0, 0);
-                skillPool.PoolRequest(this.transform.position, this.transform.rotation);
+                skillPool.PoolRequest(shooter.transform.position, this.transform.rotation);
                 this.transform.rotation = new Quaternion(0, 0, 0, 0);
             }  
         }
